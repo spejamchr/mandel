@@ -1,4 +1,7 @@
 extern crate image;
+extern crate threadpool;
+use threadpool::ThreadPool;
+use std::sync::mpsc::channel;
 
 fn main() {
     let xs = [-1.4, -0.65];
@@ -29,16 +32,31 @@ fn mandelbrot(xs: [f64; 2], ys0: [f64; 2], px_width: u32, file: &str) {
     let height: f64 = (px_height as f64 - 1.0) * pixel_size;
     let ys: [f64; 2] = [ys0[0], ys0[0] + height];
 
+    let n_workers = 12;
+    let n_jobs = px_width * px_height;
+    let pool = ThreadPool::new(n_workers);
+
+    let (tx, rx) = channel();
+
+    for x0 in 0..px_width {
+        for y0 in 0..px_height {
+            let tx = tx.clone();
+            pool.execute(move|| {
+                let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + xs[0];
+                let y0c = (1. - (y0 as f64) / (px_height as f64 - 1.0)) * height + ys[0];
+
+                let i = calc_i(x0c, y0c, max_iters) as u8;
+
+                tx.send((x0, y0, i)).unwrap();
+            });
+        }
+    }
+
     let  mut img = image::ImageBuffer::new(px_width, px_height);
 
-    for (x0, y0, pixel) in img.enumerate_pixels_mut() {
-        let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + xs[0];
-        let y0c = (1. - (y0 as f64) / (px_height as f64 - 1.0)) * height + ys[0];
-
-        let i = calc_i(x0c, y0c, max_iters) as u8;
-
-        *pixel = image::Rgb([i, i, i]);
-    }
+    rx.iter().take(n_jobs as usize).for_each(|(x, y, i)| {
+        img.put_pixel(x, y, image::Rgb([i, i, i]));
+    });
 
     img.save(file).unwrap();
 }
