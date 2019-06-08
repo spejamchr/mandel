@@ -15,7 +15,6 @@ fn mandelbrot(xs: [f64; 2], ys0: [f64; 2], px_width: u32, file: &str) {
     let ys: [f64; 2] = [ys0[0], ys0[0] + height];
 
     let  mut img = image::ImageBuffer::new(px_width, px_height);
-    let mut histogram = vec![0; 1 + max_iters as usize];
 
     for (x0, y0, pixel) in img.enumerate_pixels_mut() {
         let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + xs[0];
@@ -30,28 +29,11 @@ fn mandelbrot(xs: [f64; 2], ys0: [f64; 2], px_width: u32, file: &str) {
             x = xt;
             i += 1;
         }
-        histogram[i as usize] += 1;
 
         let i0: u8 = (i >> 8) as u8;
         let i1: u8 = (i & 255) as u8;
 
-        *pixel = image::Rgb([i0, i1, 0]);
-    }
-
-    let total: u32 = histogram.iter().sum();
-
-    for (_x0, _y0, pixel) in img.enumerate_pixels_mut() {
-        let [i0, i1, _] = (*pixel).data;
-        let i: u16 = ((i0 as u16) << 8) + (i1 as u16);
-        let index = i as usize;
-        let float_i = histogram[0..=index].iter().fold(0, |a, b| a + b) as f64;
-        let hue: u8 = (float_i / (total as f64) * 255.0) as u8;
-
-        if hue == 255 {
-        *pixel = image::Rgb([0, 0, 0]);
-        } else {
-        *pixel = image::Rgb([hue, hue, hue]);
-        }
+        *pixel = image::Rgb([i0, i1, i0 ^ i1]);
     }
 
     img.save(file).unwrap();
