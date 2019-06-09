@@ -47,7 +47,8 @@ fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
         let fraction = scaled - s as f64;
         let offest: u8 = if rng.gen::<f64>() < fraction { 0 } else { 1 };
         let offset2: u8 = if rng.gen::<f64>() < 0.5 { 0 } else { 1 };
-        let r = s - offest - offset2;
+        let mut r = s - offest - offset2;
+        if r > s { r = 0 }
         return [r, r, r];
     }
 }
