@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 image = "*"
 threadpool = "1.7"
+rand = "0.6"
