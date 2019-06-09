@@ -7,17 +7,9 @@ use std::sync::mpsc::channel;
 use rand::Rng;
 
 fn main() {
-    {
-        let xs = [-1.4, -0.65];
-        let ys = [0.0, 0.46875];
-        mandelbrot(xs, ys, 2880, "2880x1800.png");
-    }
-
-    // {
-    //     let xs = [-1.445, -0.605];
-    //     let ys = [0.0, 0.4725];
-    //     mandelbrot(xs, ys, 1920 * 2, "1920x1080.png");
-    // }
+    let xs = [-1.4, -0.65];
+    let ys = [0.0, 0.46875];
+    mandelbrot(xs, ys, 2880, "2880x1800.png");
 }
 
 fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
@@ -47,17 +39,11 @@ fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
     } else if s > 40 {
         return [s, s, s];
     } else {
-        // let f = ((scaled - s as f64) * 255.).floor() as u8;
-        // if f < 5 {
-        //     return [0, 0, 0];
-        // }
-
         let fraction = scaled - s as f64;
         let offest: u8 = if rng.gen::<f64>() < fraction { 0 } else { 1 };
         let offset2: u8 = if rng.gen::<f64>() < 0.5 { 0 } else { 1 };
         let r = s - offest - offset2;
         return [r, r, r];
-        // return [rr ^ s, f ^ rr, f ^ s];
     }
 }
 
