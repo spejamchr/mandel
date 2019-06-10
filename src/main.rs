@@ -22,7 +22,7 @@ fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
     let mut y = 0.;
     let mut i: f64 = 0.;
 
-    while x*x + y*y <= 1000. && i < max_iters as f64 {
+    while x*x + y*y <= 4. && i < max_iters as f64 {
         let xt = x*x - y*y + x0c;
         y = 2.*x*y + y0c;
         x = xt;
