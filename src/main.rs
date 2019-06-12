@@ -8,13 +8,13 @@ use rand::Rng;
 
 fn main() {
     // Standard view
-    mandelbrot([-2., 1.], [-1., 1.], 2000, "test.png");
+    // mandelbrot([-2., 1.], [-1., 1.], 2000, "mandelbrot.png");
 
     // Half of the set
-    // mandelbrot([-2.01, 0.5], [-0.01, 1.], 5880, "test.png");
+    // mandelbrot([-2.01, 0.5], [-0.01, 1.], 5880, "mandelbrot.png");
 
     // Nice wallpaper
-    // mandelbrot([-1.4, -0.65], [0.0, 0.46875], 2880, "2880x1800.png");
+    mandelbrot([-1.4, -0.65], [0.0, 0.46875], 2880, "mandelbrot.png");
 }
 
 fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
