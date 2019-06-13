@@ -23,7 +23,7 @@ fn main() {
     // mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 10000, "test.png");
 }
 
-fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
+fn calc_scaled_mandel(x0c: f64, y0c: f64, max_iters: u16) -> f64 {
     let mut x = 0.;
     let mut y = 0.;
     let mut i: f64 = 0.;
@@ -40,10 +40,14 @@ fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
         let nu = log(log_zn / log(2.)) / log(2.);
         i = i + 1. - nu;
     }
-    let mut rng = rand::thread_rng();
 
-    let scaled = i / (max_iters as f64) * 255.;
+    return i / (max_iters as f64);
+}
+
+fn calc_rgb(scaled_mandel: f64) -> [u8; 3] {
+    let scaled = scaled_mandel * 255.;
     let s = scaled as u8;
+    let mut rng = rand::thread_rng();
 
     if s == 255 {
         return [0, 0, 0];
@@ -87,7 +91,8 @@ fn mandelbrot(real: f64, imaginary: f64, zoom: f64, max_iters: u16, file: &str) 
                 let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + left;
                 let y0c = (1. - (y0 as f64) / (px_height as f64 - 1.0)) * height + bottom;
 
-                let rgb = calc_rgb(x0c, y0c, max_iters);
+                let scaled_mandel = calc_scaled_mandel(x0c, y0c, max_iters);
+                let rgb = calc_rgb(scaled_mandel);
 
                 tx.send((x0, y0, rgb)).unwrap();
             });
