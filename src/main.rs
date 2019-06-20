@@ -11,7 +11,7 @@ fn main() {
     // mandelbrot(-0.5, 0.0, 1.0, 255, "test.png");
 
     // A fun take on the standard view
-    mandelbrot(-0.5, 0.0, 1.0, 25, "test.png");
+    // mandelbrot(-0.5, 0.0, 1.0, 25, "test.png");
 
     // Half of the set
     // mandelbrot(-0.65, 0.7, 1.4, 255, "test.png");
@@ -20,7 +20,7 @@ fn main() {
     // mandelbrot(-1.025, 0.234375, 3.0931094044, 255, "test.png");
 
     // The center of a spiral zoomed to the limits of f64 accuracy
-    // mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 10000, "test.png");
+    mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 30000, "test.png");
 }
 
 fn calc_scaled_mandel(x0c: f64, y0c: f64, max_iters: u16) -> f64 {
@@ -78,7 +78,7 @@ fn mandelbrot(real: f64, imaginary: f64, zoom: f64, max_iters: u16, file: &str) 
     let bottom = imaginary - (height / 2.0);
     let left = real - (width / 2.0);
 
-    let n_workers = 4;
+    let n_workers = 12;
     let n_jobs = px_width * px_height;
     let pool = ThreadPool::new(n_workers);
 
