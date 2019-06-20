@@ -8,7 +8,7 @@ use rand::Rng;
 
 fn main() {
     // Standard view
-    // mandelbrot(-0.5, 0.0, 1.0, 255, "test.png");
+    mandelbrot(-0.5, 0.0, 1.0, 255, "test.png");
 
     // A fun take on the standard view
     // mandelbrot(-0.5, 0.0, 1.0, 25, "test.png");
@@ -20,7 +20,10 @@ fn main() {
     // mandelbrot(-1.025, 0.234375, 3.0931094044, 255, "test.png");
 
     // The center of a spiral zoomed to the limits of f64 accuracy
-    mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 30000, "test.png");
+    // mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 30000, "test.png");
+
+    // A mini-mandelbrot
+    // mandelbrot(-1.3688005, 0.0558586, 24.0, 2500, "test.png");
 }
 
 fn calc_scaled_mandel(x0c: f64, y0c: f64, max_iters: u16) -> f64 {
@@ -51,6 +54,8 @@ fn calc_rgb(scaled_mandel: f64) -> [u8; 3] {
 
     if s == 255 {
         return [0, 0, 0];
+    } else if s > 40 {
+        return [s, s, s];
     } else {
         let fraction = scaled - s as f64;
         let offest: u8 = if rng.gen::<f64>() < fraction { 0 } else { 1 };
