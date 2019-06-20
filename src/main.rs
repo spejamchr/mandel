@@ -8,13 +8,19 @@ use rand::Rng;
 
 fn main() {
     // Standard view
-    // mandelbrot([-2., 1.], [-1., 1.], 2000, "test.png");
+    // mandelbrot(-0.5, 0.0, 1.0, 255, "test.png");
+
+    // A fun take on the standard view
+    mandelbrot(-0.5, 0.0, 1.0, 25, "test.png");
 
     // Half of the set
-    // mandelbrot([-2.01, 0.5], [-0.01, 1.], 5880, "test.png");
+    // mandelbrot(-0.65, 0.7, 1.4, 255, "test.png");
 
     // Nice wallpaper
-    mandelbrot([-1.4, -0.65], [0.0, 0.46875], 2880, "test.png");
+    // mandelbrot(-1.025, 0.234375, 3.0931094044, 255, "test.png");
+
+    // The center of a spiral zoomed to the limits of f64 accuracy
+    // mandelbrot(-1.344662931374433, 0.048458507821225, 46.0, 10000, "test.png");
 }
 
 fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
@@ -41,8 +47,6 @@ fn calc_rgb(x0c: f64, y0c: f64, max_iters: u16) -> [u8; 3] {
 
     if s == 255 {
         return [0, 0, 0];
-    } else if s > 40 {
-        return [s, s, s];
     } else {
         let fraction = scaled - s as f64;
         let offest: u8 = if rng.gen::<f64>() < fraction { 0 } else { 1 };
@@ -57,15 +61,20 @@ fn log(n: f64) -> f64 {
     return n.log(2.7182818285);
 }
 
-fn mandelbrot(xs: [f64; 2], ys0: [f64; 2], px_width: u32, file: &str) {
-    let max_iters: u16 = 255;
-    let width = xs[1] - xs[0];
-    let pixel_size: f64 = (width) / (px_width as f64 - 1.0);
-    let px_height: u32 = 1 + ((ys0[1] - ys0[0]) / pixel_size).round() as u32;
-    let height: f64 = (px_height as f64 - 1.0) * pixel_size;
-    let ys: [f64; 2] = [ys0[0], ys0[0] + height];
+fn mandelbrot(real: f64, imaginary: f64, zoom: f64, max_iters: u16, file: &str) {
+    let ratio = 1.6;
+    let px_width = 2880/2;
 
-    let n_workers = 12;
+    let two: f64 = 2.0;
+
+    let height = two.powf(-1.0 * zoom + 2.0);
+    let width = height * ratio;
+    let pixel_size = width / (px_width as f64 - 1.0);
+    let px_height = 1 + (height / pixel_size).round() as u32;
+    let bottom = imaginary - (height / 2.0);
+    let left = real - (width / 2.0);
+
+    let n_workers = 4;
     let n_jobs = px_width * px_height;
     let pool = ThreadPool::new(n_workers);
 
@@ -75,8 +84,8 @@ fn mandelbrot(xs: [f64; 2], ys0: [f64; 2], px_width: u32, file: &str) {
         for y0 in 0..px_height {
             let tx = tx.clone();
             pool.execute(move|| {
-                let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + xs[0];
-                let y0c = (1. - (y0 as f64) / (px_height as f64 - 1.0)) * height + ys[0];
+                let x0c = (x0 as f64) / (px_width as f64 - 1.0) * width + left;
+                let y0c = (1. - (y0 as f64) / (px_height as f64 - 1.0)) * height + bottom;
 
                 let rgb = calc_rgb(x0c, y0c, max_iters);
 
